@@ -12,10 +12,10 @@ pub struct Arguments {
     pub query: PathBuf,
 
     /// Database connection string in format: <name>,<uri>
-    /// 
+    ///
     /// Examples:
     ///   prod-db,postgresql://user:pass@localhost/dbname
-    /// 
+    ///
     /// Can be specified multiple times to query multiple databases
     #[arg(short, long, value_name = "NAME,URI", action = ArgAction::Append)]
     pub connection_string: Vec<ConnectionString>,
