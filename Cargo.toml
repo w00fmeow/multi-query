@@ -1,0 +1,71 @@
+[package]
+name = "multi-query"
+version = "0.0.5"
+edition = "2024"
+authors = ["Yoni Samoded <yoni.samoded@gmail.com>"]
+description = "Multi-database query executor with unified JSON output"
+license = "Unlicense OR MIT"
+documentation = "https://github.com/w00fmeow/multi-query"
+homepage = "https://github.com/w00fmeow/multi-query"
+repository = "https://github.com/w00fmeow/multi-query"
+keywords = ["cli", "json", "db", "query"]
+categories = ["command-line-utilities"]
+
+
+[dependencies]
+futures = "0.3.30"
+reqwest = { version = "0.11.24", features = ["cookies","json","stream"] }
+tokio = { version = "1.36.0", features = ["full"] }
+serde = { version = "1.0.143", features = ["derive"] }
+serde_json = "1.0.99"
+regex = "1.10.4"
+anyhow = "1.0.86"
+dotenv = "0.15.0"
+tracing = "0.1.41"
+chrono = { version = "0.4.41", features = ["serde"] }
+clap = { version = "4.5.51", features = ["derive"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
+sqlx = {version = "0.8.3", features = ["postgres", "sqlite", "runtime-tokio-native-tls", "chrono" ] }
+tokio-stream = "0.1.17"
+tokio-util = "0.7.13"
+openssl = { version = "0.10", features = ["vendored"] }
+
+[dev-dependencies]
+tempfile = "3.8"
+uuid = { version = "1.10", features = ["v4"] }
+serde_json = "1.0.99"
+
+[build-dependencies]
+clap = { version = "4.5.51", features = ["derive", "cargo","env"] }
+clap_complete = "4.5.6"
+clap_mangen = "0.2.31"
+
+
+[profile.release]
+opt-level = 3
+debug = "none"
+strip = "symbols"
+debug-assertions = false
+overflow-checks = false
+lto = "fat"
+panic = "abort"
+incremental = false
+codegen-units = 1
+
+[package.metadata.deb]
+section = "utils"
+assets = [
+  ["target/release/multi-query", "usr/bin/", "755"],
+  ["COPYING", "usr/share/doc/multi-query/", "644"],
+  ["LICENSE-MIT", "usr/share/doc/multi-query/", "644"],
+  ["UNLICENSE", "usr/share/doc/multi-query/", "644"],
+  ["README.md", "usr/share/doc/multi-query/README", "644"],
+  ["target/assets/multi-query.1", "usr/share/man/man1/multi-query.1", "644"],
+  ["target/assets/multi-query.bash", "usr/share/bash-completion/completions/multi-query", "644"],
+  ["target/assets/_multi-query", "usr/share/zsh/vendor-completions/_multi-query", "644"],
+  ["target/assets/multi-query.desktop", "usr/share/applications/multi-query.desktop", "644"],
+  ["assets/logo.png", "usr/share/pixmaps/multi-query.png", "644"],
+]
+extended-description = """\
+multi-query - Multi-database query executor with unified JSON output
+"""
