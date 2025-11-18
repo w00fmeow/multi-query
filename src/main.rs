@@ -16,7 +16,7 @@ mod tests;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    dotenv()?;
+    dotenv().ok();
 
     if std::env::var("RUST_LOG").is_ok() {
         fmt().with_env_filter(EnvFilter::from_default_env()).init();
