@@ -23,7 +23,7 @@ tracing = "0.1.41"
 chrono = { version = "0.4.41", features = ["serde"] }
 clap = { version = "4.5.51", features = ["derive"] }
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
-sqlx = {version = "0.8.3", features = ["postgres", "sqlite", "runtime-tokio-native-tls", "chrono" ] }
+sqlx = {version = "0.8.3", features = ["postgres", "sqlite", "runtime-tokio-rustls", "chrono" ] }
 tokio-stream = "0.1.17"
 tokio-util = "0.7.13"
 
