@@ -50,6 +50,7 @@ codegen-units = 1
 
 [package.metadata.deb]
 section = "utils"
+depends = ""
 assets = [
   ["target/release/multi-query", "usr/bin/", "755"],
   ["COPYING", "usr/share/doc/multi-query/", "644"],
