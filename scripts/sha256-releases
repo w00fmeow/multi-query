@@ -19,7 +19,7 @@ done
 
 # Source.
 for ext in zip tar.gz; do
-  url="https://github.com/w00fmeow/multi-query/releases/archive/$version.$ext"
+  url="https://github.com/w00fmeow/multi-query/archive/refs/tags/$version.$ext"
   sha=$(curl -sfSL "$url" | sha256sum)
   echo "source.$ext $sha"
 done
