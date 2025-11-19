@@ -105,8 +105,10 @@ jobs:
           ${{ env.CARGO }} build --verbose --release ${{ env.TARGET_FLAGS }}
           bin="target/${{ matrix.target }}/release/multi-query"
           build_assets="target/${{ matrix.target }}/assets"
+          build_completions="target/${{ matrix.target }}/completions"
           echo "BIN=$bin" >> $GITHUB_ENV
           echo "BUILD_ASSETS_DIR=$build_assets" >> $GITHUB_ENV
+          echo "BUILD_COMPLETIONS_DIR=$build_completions" >> $GITHUB_ENV
 
       - name: Strip release binary (macos)
         if: matrix.os == 'macos-latest'
@@ -135,8 +137,8 @@ jobs:
           mkdir -p "$ARCHIVE"/{complete,doc}
           cp "$BIN" "$ARCHIVE"/
           cp {README.md,COPYING,UNLICENSE,LICENSE-MIT} "$ARCHIVE"/
-          mv "$BUILD_ASSETS_DIR/multi-query.1" "$ARCHIVE/doc/"/
-          cp -a $BUILD_ASSETS_DIR/* "$ARCHIVE/complete/"
+          cp "$BUILD_ASSETS_DIR/multi-query.1" "$ARCHIVE/doc/"/
+          cp -r "$BUILD_COMPLETIONS_DIR"/* "$ARCHIVE/complete/"
 
       - name: Build archive (Unix)
         shell: bash
@@ -185,8 +187,11 @@ jobs:
         shell: bash
         run: |
           cargo build -r --target ${{ env.TARGET }}
-          echo "moving assets level up"
+          echo "moving assets and completions level up"
+          mkdir -p target/release
+          cp "target/${{ env.TARGET }}/release/multi-query" target/release/
           mv "target/${{ env.TARGET }}/assets/" target/
+          mv "target/${{ env.TARGET }}/completions/" target/
 
       - name: Create .deb file
         shell: bash

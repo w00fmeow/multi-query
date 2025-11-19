@@ -17,7 +17,8 @@ class MultiQuery < Formula
     bin.install "multi-query"
     man1.install "doc/multi-query.1"
 
-    bash_completion.install "complete/multi-query.bash"
+    bash_completion.install "complete/multi-query.bash" => "multi-query"
     zsh_completion.install "complete/_multi-query"
+    fish_completion.install "complete/multi-query.fish"
   end
 end

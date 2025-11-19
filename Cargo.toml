@@ -58,8 +58,9 @@ assets = [
   ["UNLICENSE", "usr/share/doc/multi-query/", "644"],
   ["README.md", "usr/share/doc/multi-query/README", "644"],
   ["target/assets/multi-query.1", "usr/share/man/man1/multi-query.1", "644"],
-  ["target/assets/multi-query.bash", "usr/share/bash-completion/completions/multi-query", "644"],
-  ["target/assets/_multi-query", "usr/share/zsh/vendor-completions/_multi-query", "644"],
+  ["target/completions/multi-query.bash", "usr/share/bash-completion/completions/multi-query", "644"],
+  ["target/completions/_multi-query", "usr/share/zsh/vendor-completions/_multi-query", "644"],
+  ["target/completions/multi-query.fish", "usr/share/fish/vendor_completions.d/multi-query.fish", "644"],
   ["target/assets/multi-query.desktop", "usr/share/applications/multi-query.desktop", "644"],
   ["assets/logo.png", "usr/share/pixmaps/multi-query.png", "644"],
 ]

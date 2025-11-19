@@ -149,15 +149,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     let out_path = PathBuf::from(outdir);
-    let mut path = out_path.ancestors().nth(4).unwrap().to_owned();
-    path.push("assets");
-    std::fs::create_dir_all(&path).unwrap();
+    let base_path = out_path.ancestors().nth(4).unwrap().to_owned();
 
-    build_shell_completion(&path, &package_meta)?;
-    build_manpages(&path, &package_meta)?;
+    let mut completions_path = base_path.clone();
+    completions_path.push("completions");
+    std::fs::create_dir_all(&completions_path).unwrap();
 
-    build_control_file(&path, &package_meta)?;
-    build_desktop_file(&path, &package_meta)?;
+    build_shell_completion(&completions_path, &package_meta)?;
+
+    let mut assets_path = base_path.clone();
+    assets_path.push("assets");
+    std::fs::create_dir_all(&assets_path).unwrap();
+
+    build_manpages(&assets_path, &package_meta)?;
+    build_control_file(&assets_path, &package_meta)?;
+    build_desktop_file(&assets_path, &package_meta)?;
 
     Ok(())
 }
