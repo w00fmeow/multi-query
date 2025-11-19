@@ -5,10 +5,10 @@ class MultiQuery < Formula
 
   if OS.mac?
       url "https://github.com/w00fmeow/multi-query/releases/download/#{version}/multi-query-#{version}-x86_64-apple-darwin.tar.gz"
-      sha256 "b61c8680b611fbf9cb7b5bf5bc67e1a5814cdf8daa490fb4d7ef988e69c4ed0c"
+      sha256 "e4a5232f0b5382eb0c3556f2637a8262b00ba4854fc451953e16a46eba83959c"
   elsif OS.linux?
       url "https://github.com/w00fmeow/multi-query/releases/download/#{version}/multi-query-#{version}-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "e916a841e317b8ea3238d3409479970d35ac69d658e0325e136384fd50f591dd"
+      sha256 "aee0821bc3fcc4b6260658ba1526afb1a23f79ea606e5c2c596c9385749bf3db"
   end
 
   conflicts_with "multi-query"
