@@ -17,6 +17,6 @@ pub struct Arguments {
     ///   prod-db,postgresql://user:pass@localhost/dbname
     ///
     /// Can be specified multiple times to query multiple databases
-    #[arg(short, long, value_name = "NAME,URI", action = ArgAction::Append)]
+    #[arg(short, long, value_name = "NAME,URI", action = ArgAction::Append, required = true, num_args = 1..)]
     pub connection_string: Vec<ConnectionString>,
 }
