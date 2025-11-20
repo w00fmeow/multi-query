@@ -410,3 +410,115 @@ fn test_json_function() {
 
     assert_eq!(results, expected);
 }
+
+#[test]
+fn test_enum_types() {
+    let setup_sql = r#"
+        CREATE TABLE products (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            status TEXT CHECK(status IN ('active', 'inactive', 'pending')),
+            category TEXT CHECK(category IN ('electronics', 'clothing', 'food'))
+        );
+        INSERT INTO products (id, name, status, category) 
+        VALUES (1, 'Laptop', 'active', 'electronics');
+        INSERT INTO products (id, name, status, category) 
+        VALUES (2, 'Shirt', 'inactive', 'clothing');
+        INSERT INTO products (id, name, status, category) 
+        VALUES (3, 'Apple', 'pending', 'food');
+    "#;
+
+    let (_temp_dir, db_uri) = create_test_sqlite_db(setup_sql);
+
+    let query = "SELECT * FROM products ORDER BY id;";
+    let query_file = create_query_file(query);
+
+    let cli_path = build_cli();
+    let connection_strings = vec![("test_db".to_string(), db_uri)];
+    let output = run_cli(&cli_path, query_file.path(), &connection_strings)
+        .expect("CLI execution failed");
+
+    let results = parse_json_lines(&output);
+
+    let expected = vec![
+        json!({
+            "db_name": "test_db",
+            "id": 1,
+            "name": "Laptop",
+            "status": "active",
+            "category": "electronics"
+        }),
+        json!({
+            "db_name": "test_db",
+            "id": 2,
+            "name": "Shirt",
+            "status": "inactive",
+            "category": "clothing"
+        }),
+        json!({
+            "db_name": "test_db",
+            "id": 3,
+            "name": "Apple",
+            "status": "pending",
+            "category": "food"
+        }),
+    ];
+
+    assert_eq!(results, expected);
+}
+
+#[test]
+fn test_null_dates() {
+    let setup_sql = r#"
+        CREATE TABLE events (
+            id INTEGER PRIMARY KEY,
+            event_name TEXT,
+            start_date DATE,
+            end_date DATE
+        );
+        INSERT INTO events (id, event_name, start_date, end_date) 
+        VALUES (1, 'Conference', '2024-06-15', '2024-06-17');
+        INSERT INTO events (id, event_name, start_date, end_date) 
+        VALUES (2, 'Ongoing Event', '2024-01-01', NULL);
+        INSERT INTO events (id, event_name, start_date, end_date) 
+        VALUES (3, 'TBD Event', NULL, NULL);
+    "#;
+
+    let (_temp_dir, db_uri) = create_test_sqlite_db(setup_sql);
+
+    let query = "SELECT * FROM events ORDER BY id;";
+    let query_file = create_query_file(query);
+
+    let cli_path = build_cli();
+    let connection_strings = vec![("test_db".to_string(), db_uri)];
+    let output = run_cli(&cli_path, query_file.path(), &connection_strings)
+        .expect("CLI execution failed");
+
+    let results = parse_json_lines(&output);
+
+    let expected = vec![
+        json!({
+            "db_name": "test_db",
+            "id": 1,
+            "event_name": "Conference",
+            "start_date": "2024-06-15",
+            "end_date": "2024-06-17"
+        }),
+        json!({
+            "db_name": "test_db",
+            "id": 2,
+            "event_name": "Ongoing Event",
+            "start_date": "2024-01-01",
+            "end_date": null
+        }),
+        json!({
+            "db_name": "test_db",
+            "id": 3,
+            "event_name": "TBD Event",
+            "start_date": null,
+            "end_date": null
+        }),
+    ];
+
+    assert_eq!(results, expected);
+}
