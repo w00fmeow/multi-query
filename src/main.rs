@@ -1,3 +1,5 @@
+use std::process;
+
 use anyhow::Result;
 use clap::Parser;
 use dotenv::dotenv;
@@ -41,7 +43,8 @@ async fn main() -> Result<()> {
 
         Err(err) => {
             error!("{err}");
-            Ok(())
+            eprintln!("{}", err.to_string());
+            process::exit(1)
         }
     }
 }

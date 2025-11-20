@@ -252,3 +252,31 @@ fn test_invalid_query_file() {
 
     assert!(!output.status.success() || output.stdout.is_empty());
 }
+
+#[test]
+fn test_query_nonexistent_table_returns_error() {
+    let setup_sql = r#"
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+        INSERT INTO users (id, name) VALUES (1, 'Alice');
+    "#;
+
+    let (_temp_dir, db_uri) = create_test_sqlite_db(setup_sql);
+
+    let query = "SELECT * FROM nonexistent_table;";
+    let query_file = create_query_file(query);
+
+    let cli_path = build_cli();
+    let connection_strings = vec![("test_db".to_string(), db_uri)];
+
+    let result = run_cli(&cli_path, query_file.path(), &connection_strings);
+
+    let error =
+        result.expect_err("Expected error when querying nonexistent table");
+    let error_msg = format!("{}", error);
+
+    let expected_error = "error returned from database: (code: 1) no such table: nonexistent_table\n";
+    assert_eq!(error_msg, expected_error);
+}

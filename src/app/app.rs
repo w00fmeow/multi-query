@@ -44,7 +44,11 @@ impl App {
             spawn(async move { db.query(query.as_str()).await })
         });
 
-        try_join_all(futures).await?;
+        let results = try_join_all(futures).await?;
+
+        for result in results {
+            result?;
+        }
 
         Ok(())
     }
