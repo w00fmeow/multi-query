@@ -21,7 +21,7 @@ use app::types::ConnectionString;
 #[path = "src/cli/arguments.rs"]
 mod arguments;
 
-use arguments::build_cli;
+use arguments::{build_arguments, CliOptions};
 
 struct PackageMeta {
     name: String,
@@ -45,7 +45,7 @@ fn build_shell_completion(
     outdir: &Path,
     package_meta: &PackageMeta,
 ) -> Result<(), Error> {
-    let mut cmd = build_cli();
+    let mut cmd = build_arguments(CliOptions::default());
 
     for &shell in Shell::value_variants() {
         generate_to(shell, &mut cmd, &package_meta.name, outdir)?;
@@ -58,7 +58,7 @@ fn build_manpages(
     outdir: &Path,
     package_meta: &PackageMeta,
 ) -> Result<(), Error> {
-    let app = build_cli();
+    let app = build_arguments(CliOptions::default());
 
     let file = Path::new(&outdir).join(format!("{}.1", package_meta.name));
     let mut file = File::create(&file)?;
