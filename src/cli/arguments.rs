@@ -1,22 +1,26 @@
-use std::path::PathBuf;
-
-use clap::{ArgAction, Parser};
+use clap::{command, value_parser, Arg, ArgAction, Command};
 
 use crate::ConnectionString;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-pub struct Arguments {
-    /// Path to SQL query file to execute across all databases
-    #[arg(short, long, value_name = "FILE")]
-    pub query: PathBuf,
-
-    /// Database connection string in format: <name>,<uri>
-    ///
-    /// Examples:
-    ///   prod-db,postgresql://user:pass@localhost/dbname
-    ///
-    /// Can be specified multiple times to query multiple databases
-    #[arg(short, long, value_name = "NAME,URI", action = ArgAction::Append, required = true, num_args = 1..)]
-    pub connection_string: Vec<ConnectionString>,
+pub fn build_cli() -> Command {
+    command!() // Uses cargo metadata for name, version, author, about
+        .arg(
+            Arg::new("query")
+                .short('q')
+                .long("query")
+                .value_name("FILE")
+                .help("Path to SQL query file to execute across all databases")
+                .required(true)
+                .value_parser(value_parser!(std::path::PathBuf))
+        )
+        .arg(
+            Arg::new("connection_string")
+                .short('c')
+                .long("connection-string")
+                .value_name("NAME,URI")
+                .help("Database connection string in format: <name>,<uri>\n\nExamples:\n  prod-db,postgresql://user:pass@localhost/dbname\n\nCan be specified multiple times to query multiple databases")
+                .required(true)
+                .action(ArgAction::Append)
+                .value_parser(value_parser!(ConnectionString))
+        )
 }

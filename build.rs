@@ -1,4 +1,4 @@
-use clap::{CommandFactory, ValueEnum};
+use clap::ValueEnum;
 use clap_complete::Shell;
 use clap_complete::generate_to;
 use clap_mangen::Man;
@@ -21,7 +21,7 @@ use app::types::ConnectionString;
 #[path = "src/cli/arguments.rs"]
 mod arguments;
 
-use arguments::Arguments;
+use arguments::build_cli;
 
 struct PackageMeta {
     name: String,
@@ -45,7 +45,7 @@ fn build_shell_completion(
     outdir: &Path,
     package_meta: &PackageMeta,
 ) -> Result<(), Error> {
-    let mut cmd = Arguments::command();
+    let mut cmd = build_cli();
 
     for &shell in Shell::value_variants() {
         generate_to(shell, &mut cmd, &package_meta.name, outdir)?;
@@ -58,7 +58,7 @@ fn build_manpages(
     outdir: &Path,
     package_meta: &PackageMeta,
 ) -> Result<(), Error> {
-    let app = Arguments::command();
+    let app = build_cli();
 
     let file = Path::new(&outdir).join(format!("{}.1", package_meta.name));
     let mut file = File::create(&file)?;

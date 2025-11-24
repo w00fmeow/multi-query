@@ -1,15 +1,12 @@
-use std::process;
+use std::{path::PathBuf, process};
 
 use anyhow::Result;
-use clap::Parser;
 use dotenv::dotenv;
 use tracing::{debug, error};
 use tracing_subscriber::{EnvFilter, fmt};
 
 pub mod app;
 pub use app::*;
-
-use crate::cli::Arguments;
 
 pub mod cli;
 
@@ -24,17 +21,27 @@ async fn main() -> Result<()> {
         fmt().with_env_filter(EnvFilter::from_default_env()).init();
     }
 
-    let args = match Arguments::try_parse() {
+    let matches = match cli::build_cli().try_get_matches() {
         Err(err) => {
             println!("{err}");
             return Ok(());
         }
-        Ok(args) => args,
+        Ok(matches) => matches,
     };
 
-    debug!("{:?}", args);
+    debug!("{:?}", matches);
 
-    let app = App::new(args.connection_string, args.query).await?;
+    let query = matches.get_one::<PathBuf>("query")
+        .expect("required")
+        .clone();
+    
+    let connection_string: Vec<ConnectionString> = matches
+        .get_many::<ConnectionString>("connection_string")
+        .expect("required")
+        .cloned()
+        .collect();
+
+    let app = App::new(connection_string, query).await?;
 
     let result = app.execute_query_from_file().await;
 

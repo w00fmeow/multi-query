@@ -1,3 +1,3 @@
 pub mod arguments;
 
-pub use arguments::Arguments;
+pub use arguments::build_cli;
