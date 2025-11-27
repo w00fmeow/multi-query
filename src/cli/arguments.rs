@@ -8,7 +8,7 @@ pub struct CliOptions {
 }
 
 impl CliOptions {
-    pub fn default() -> Self {
+    pub fn required() -> Self {
         Self { query_required: true, connection_string_required: true }
     }
 }

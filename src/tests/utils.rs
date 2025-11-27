@@ -1,9 +1,11 @@
 use serde_json::Value;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
-use tempfile::{NamedTempFile, TempDir};
-use uuid::Uuid;
+use std::process::Command;
+use tempfile::NamedTempFile;
+use testcontainers::core::IntoContainerPort;
+use testcontainers::{ContainerAsync, runners::AsyncRunner};
+use testcontainers_modules::postgres::Postgres;
 
 pub fn create_query_file(query: &str) -> NamedTempFile {
     let mut file =
@@ -55,37 +57,28 @@ pub fn parse_json_lines(output: &str) -> Vec<Value> {
         .collect()
 }
 
-fn random_db_name() -> String {
-    format!("db_{}", Uuid::new_v4().simple())
+pub struct PostgresContainer {
+    _container: ContainerAsync<Postgres>,
+    pub uri: String,
 }
 
-pub fn create_test_sqlite_db(setup_sql: &str) -> (TempDir, String) {
-    let temp_dir = TempDir::new().expect("Failed to create temp dir");
-    let db_name = random_db_name();
-    let db_path = temp_dir.path().join(format!("{}.db", db_name));
-    let uri = format!("sqlite://{}", db_path.display());
+pub async fn create_test_postgres_db(setup_sql: &str) -> PostgresContainer {
+    let postgres = if setup_sql.is_empty() {
+        Postgres::default()
+    } else {
+        Postgres::default().with_init_sql(setup_sql.as_bytes().to_vec())
+    };
 
-    let mut child = Command::new("sqlite3")
-        .arg(&db_path)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::null())
-        .stderr(Stdio::piped())
-        .spawn()
-        .expect("Failed to spawn sqlite3");
+    let container =
+        postgres.start().await.expect("Failed to start PostgreSQL container");
 
-    if let Some(mut stdin) = child.stdin.take() {
-        stdin
-            .write_all(setup_sql.as_bytes())
-            .expect("Failed to write to sqlite3 stdin");
-    }
+    let host = container.get_host().await.expect("Failed to get host");
+    let port = container
+        .get_host_port_ipv4(5432.tcp())
+        .await
+        .expect("Failed to get port");
+    let uri =
+        format!("postgresql://postgres:postgres@{}:{}/postgres", host, port);
 
-    let output = child.wait_with_output().expect("Failed to wait for sqlite3");
-    if !output.status.success() {
-        panic!(
-            "Failed to setup database: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    (temp_dir, uri)
+    PostgresContainer { _container: container, uri }
 }
