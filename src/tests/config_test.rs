@@ -1,4 +1,4 @@
-use super::utils::{build_cli, parse_json_lines};
+use super::utils::{build_cli, create_test_postgres_db, parse_json_lines};
 use crate::ConnectionString;
 use crate::config::Config;
 use serde_json::json;
@@ -80,18 +80,22 @@ fn test_generate_config_overwrites_existing() {
     assert_eq!(config, expected);
 }
 
-#[test]
-fn test_load_valid_config_file() {
+#[tokio::test]
+async fn test_load_valid_config_file() {
+    let pg_container = create_test_postgres_db("").await;
     let cli_path = build_cli();
     let temp_dir = TempDir::new().unwrap();
     let config_path = temp_dir.path().join("config.json");
     let query_file = temp_dir.path().join("query.sql");
 
-    let config_content = r#"{
+    let config_content = format!(
+        r#"{{
         "connection_strings": [
-            {"name": "test_db", "uri": "sqlite://:memory:"}
+            {{"name": "test_db", "uri": "{}"}}
         ]
-    }"#;
+    }}"#,
+        pg_container.uri
+    );
 
     std::fs::write(&config_path, config_content).unwrap();
     std::fs::write(&query_file, "SELECT 1").unwrap();
@@ -111,7 +115,7 @@ fn test_load_valid_config_file() {
     let results = parse_json_lines(&stdout);
 
     let expected = vec![json!({
-        "1": 1,
+        "?column?": 1,
         "db_name": "test_db"
     })];
 

@@ -29,21 +29,20 @@ async fn main() -> Result<()> {
         connection_string_required: false,
     })
     .try_get_matches()
+        && matches.get_flag("generate_config")
     {
-        if matches.get_flag("generate_config") {
-            let config_path = matches
-                .get_one::<PathBuf>("config")
-                .expect("has default value")
-                .clone();
+        let config_path = matches
+            .get_one::<PathBuf>("config")
+            .expect("has default value")
+            .clone();
 
-            config::Config::generate_to_file(&config_path).await?;
-            println!("Config file generated at: {}", config_path.display());
-            return Ok(());
-        }
+        config::Config::generate_to_file(&config_path).await?;
+        println!("Config file generated at: {}", config_path.display());
+        return Ok(());
     }
 
     let (query, connection_strings) =
-        match cli::build_arguments(cli::CliOptions::default())
+        match cli::build_arguments(cli::CliOptions::required())
             .try_get_matches()
         {
             Ok(matches) => {
@@ -84,7 +83,7 @@ async fn main() -> Result<()> {
                 if config_path == default_config_path()?
                     && !config_path.exists()
                 {
-                    cli::build_arguments(cli::CliOptions::default())
+                    cli::build_arguments(cli::CliOptions::required())
                         .get_matches();
                 }
 
@@ -104,7 +103,7 @@ async fn main() -> Result<()> {
 
         Err(err) => {
             error!("{err}");
-            eprintln!("{}", err.to_string());
+            eprintln!("{}", err);
             process::exit(1)
         }
     }
