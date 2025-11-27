@@ -1,6 +1,6 @@
 [package]
 name = "multi-query"
-version = "0.0.7"
+version = "0.0.8"
 edition = "2024"
 authors = ["Yoni Samoded <yoni.samoded@gmail.com>"]
 description = "Multi-database query executor with unified JSON output"
