@@ -31,7 +31,7 @@ cat > "$HOOKS_DIR/pre-push" << 'EOF'
 set -e
 
 echo "Running tests..."
-cargo test -- --test-threads=2 || {
+cargo test -- --test-threads=3 || {
     echo "❌ Tests failed. Fix them before pushing."
     exit 1
 }
